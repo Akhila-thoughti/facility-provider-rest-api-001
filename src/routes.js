@@ -3,6 +3,7 @@ var router = express.Router();
 const UserMaster = require("./controllers/users");
 const FacilityMaster = require("./controllers/facilities");
 const UserLogin = require("./controllers/userLogin");
+var facilityRoutes = require("./controllers/list");
 
 // Users API
 router.get("/users", UserMaster.getUserList);
@@ -11,6 +12,8 @@ router.post("/users", UserMaster.newUser);
 router.put("/users", UserMaster.updateUser);
 
 // facilities API
+router.get("/", FacilityMaster.getList);
+router.use("/list", facilityRoutes);
 router.get("/facilities", FacilityMaster.getFacilitiesList);
 router.get(`/facilities/:facilityId`, FacilityMaster.getFacilityById);
 router.post("/facilities", FacilityMaster.createFacility);

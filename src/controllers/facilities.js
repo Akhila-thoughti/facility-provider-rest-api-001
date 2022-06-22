@@ -2,20 +2,34 @@ var moment = require("moment");
 var Models = require("../models");
 
 class Facility {
+  async getList(req, res) {
+    try {
+      return res.status(200).json({
+        message: "App is working.",
+      });
+    } catch (error) {
+      res.json({ status: false, message: "Failed!" });
+    }
+  }
+
   /**
    * Get list of facilities API
    */
   async getFacilitiesList(req, res) {
     try {
-      Models.Facility.findAll().then((facilities) => {
+      await Models.Facility.findAll().then((facilities) => {
         if (facilities?.length == 0) {
-          res.json({ status: 404, message: "Facilities Not Found!", data: facilities });
-        }
-        else if (facilities?.length > 0)
+          res.json({
+            status: 404,
+            message: "Facilities Not Found!",
+            data: facilities,
+          });
+        } else if (facilities?.length > 0)
           res.json({ status: 200, data: facilities });
-      })
-    }
-    catch (error) {
+      });
+    } catch (error) {
+
+      if (error) throw error;
       res.json({ status: false, message: "Failed!" });
     }
   }
@@ -26,17 +40,20 @@ class Facility {
   async getFacilityById(req, res) {
     try {
       let facility_id = req.params.facilityId;
-      Models.Facility.findOne({
+      await Models.Facility.findOne({
         where: { facility_id: facility_id },
       }).then((facilities) => {
-        if (facilities == null || facilities == undefined || facilities?.length == 0) {
+    
+        if (
+          facilities == null ||
+          facilities == undefined ||
+          facilities?.length == 0
+        ) {
           res.json({ status: 404, message: "Facility not Found!" });
-        }
-        else if (facilities != null || facilities != undefined)
+        } else if (facilities != null || facilities != undefined)
           res.json({ status: 200, data: facilities });
-      })
-    }
-    catch (error) {
+      });
+    } catch (error) {
       res.json({ status: false, message: "Failed!" });
     }
   }
@@ -52,43 +69,46 @@ class Facility {
         created_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
         updated_at: null,
         deleted_at: null,
-        facility_status: data.facility_status
+        facility_status: data.facility_status,
       };
 
-      if (data.facility_name == undefined ||
+      if (
+        data.facility_name == undefined ||
         data.facility_name == null ||
-        data.facility_name == "") {
+        data.facility_name == ""
+      ) {
         res.json({ status: 404, message: "Facility Name is Required!" });
       }
 
-      if (data.facility_name != undefined ||
+      if (
+        data.facility_name != undefined ||
         data.facility_name != null ||
-        data.facility_name != "") {
-
+        data.facility_name != ""
+      ) {
         Models.Facility.findOne({
           where: { facility_name: data.facility_name },
         }).then((facilityExists) => {
           if (facilityExists || facilityExists == !null) {
             res.json({ status: 403, message: "Facility Name already Exists!" });
           }
-          if ((facilityExists == null || facilityExists == undefined)) {
-
+          if (facilityExists == null || facilityExists == undefined) {
             Models.Facility.create(dataForFacility).then((facilities) => {
-
-              res.json({ status: 200, message: "Facility Added Successfully!" });
-            })
+              res.json({
+                status: 200,
+                message: "Facility Added Successfully!",
+              });
+            });
           }
-        })
+        });
       }
-    }
-    catch (error) {
+    } catch (error) {
       res.json({ status: false, message: "Failed!" });
     }
   }
 
   /**
-    * Update existing facility API
-    */
+   * Update existing facility API
+   */
   async updateFacility(req, res) {
     try {
       let data = req.body;
@@ -96,19 +116,22 @@ class Facility {
       let dataForFacility = {
         facility_name: data.facility_name,
         updated_at: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-        facility_status: data.facility_status
+        facility_status: data.facility_status,
       };
 
-      if (data.facility_id == undefined ||
+      if (
+        data.facility_id == undefined ||
         data.facility_id == null ||
-        data.facility_id == "") {
+        data.facility_id == ""
+      ) {
         res.json({ status: 404, message: "Facility Id is Required!" });
       }
 
-      if (data.facility_id != undefined ||
+      if (
+        data.facility_id != undefined ||
         data.facility_id != null ||
-        data.facility_id != "") {
-
+        data.facility_id != ""
+      ) {
         Models.Facility.findOne({
           where: { facility_name: data.facility_name },
         }).then((facilityExists) => {
@@ -116,23 +139,25 @@ class Facility {
             res.json({ status: 403, message: "Facility Name already Exists!" });
           }
 
-          if ((facilityExists == null || facilityExists == undefined)) {
+          if (facilityExists == null || facilityExists == undefined) {
             Models.Facility.update(dataForFacility, {
               where: { facility_id: data.facility_id },
             }).then((facilityUpdated) => {
               if (facilityUpdated.indexOf(0) == -1) {
-                res.json({ status: 200, message: "Facility Updated Successfully!" });
+                res.json({
+                  status: 200,
+                  message: "Facility Updated Successfully!",
+                });
               }
 
               if (facilityUpdated.indexOf(0) == 0) {
                 res.json({ status: 404, message: "Update Failed!" });
               }
-            })
+            });
           }
-        })
+        });
       }
-    }
-    catch (error) {
+    } catch (error) {
       res.json({ status: false, message: "Failed!" });
     }
   }

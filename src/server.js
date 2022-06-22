@@ -2,11 +2,12 @@ require("dotenv").config();
 var express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const mysql = require('mysql2');
 var http = require("http");
 var app = express();
 var router = require("./routes");
 
-const port = 5000
+const port = 3001
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,6 +24,7 @@ app.use(cors());
 
 // import router
 app.use(router);
+
 
 // create http server
 let server = http.createServer(app);
